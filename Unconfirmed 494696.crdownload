@@ -1,0 +1,1879 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# #  <center><div style="font-family: Trebuchet MS; background-color: #40E0D0; color: #2D2926; padding: 12px; line-height: 1;">Portfolio Enhancing  : A Sectoral Approach   </center>
+
+# In[3]:
+
+
+# importing the libraries 
+import pandas as pd
+import numpy as np
+import seaborn as sns 
+import ta
+import pandas as pd
+from pypfopt.efficient_frontier import EfficientFrontier
+from pypfopt import risk_models
+from pypfopt import expected_returns
+
+
+
+# In[4]:
+
+
+#loading the dataset
+import yfinance as yf
+from requests.exceptions import HTTPError
+import pandas as pd
+
+# List of ticker symbols
+ticker_symbols = [
+    "RELIANCE.NS",
+    "TCS.NS",
+    "HDB",
+    "IBN",
+    "INFY",
+    "SBIN.NS",
+    "LICI.NS",
+    "BHARTIARTL.NS",
+    "HINDUNILVR.NS",
+    "ITC.NS",
+    "LT.NS",
+    "HCLTECH.NS",
+    "BAJFINANCE.NS",
+    "SUNPHARMA.NS",
+    "ADANIENT.NS",
+    "MARUTI.NS",
+    "TATAMOTORS.NS",
+    "KOTAKBANK.NS",
+    "ONGC.NS",
+    "AXISBANK.BO",
+    "TITAN.NS",
+    "NTPC.NS",
+    "ADANIGREEN.NS",
+    "ULTRACEMCO.NS",
+    "ASIANPAINT.NS",
+    "ADANIPORTS.NS",
+    "WIT",
+    "COALINDIA.NS",
+    "POWERGRID.NS",
+    "BAJAJFINSV.NS",
+    "DMART.NS",
+    "NESTLEIND.NS",
+    "IOC.NS",
+    "M&M.NS",
+    "BAJAJ-AUTO.NS",
+    "DLF.NS",
+    "ADANIPOWER.NS",
+    "HAL.NS",
+    "IRFC.NS",
+    "JSWSTEEL.NS",
+    "VBL.NS",
+    "TATASTEEL.NS",
+    "LTIM.NS",
+    "SIEMENS.NS",
+    "SBILIFE.NS",
+    "BEL.NS",
+    "GRASIM.NS",
+    "ZOMATO.NS",
+    "PNB.NS",
+    "PIDILITIND.NS",
+    "BANKBARODA.NS",
+    "TRENT.NS",
+    "PFC.NS",
+    "BPCL.NS",
+    "HINDZINC.NS",
+    "TECHM.NS",
+    "GODREJCP.NS",
+    "IOB.NS",
+    "HDFCLIFE.NS",
+    "INDIGO.NS",
+    "RECLTD.NS",
+    "TATAPOWER.NS",
+    "ADANIENSOL.NS",
+    "AMBUJACEM.NS",
+    "BRITANNIA.NS",
+    "CIPLA.NS",
+    "GAIL.NS",
+    "HINDALCO.NS",
+    "INDUSINDBK.NS",
+    "ABB.NS",
+    "ATGL.NS",
+    "TATACONSUM.NS",
+    "UNIONBANK.NS",
+    "EICHERMOT.NS",
+    "RDY",
+    "LODHA.NS",
+    "CANBK.NS",
+    "TVSMOTOR.NS",
+    "VEDL.NS",
+    "IDBI.NS",
+    "BAJAJHLDNG.NS",
+    "APOLLOHOSP.NS",
+    "DIVISLAB.NS",
+    "SHREECEM.NS",
+    "DABUR.NS",
+    "ZYDUSLIFE.NS",
+    "CHOLAFIN.NS",
+    "NHPC.NS",
+    "SHRIRAMFIN.NS",
+    "HEROMOTOCO.NS",
+    "HAVELLS.NS",
+    "TORNTPHARM.NS",
+    "MANKIND.NS",
+    "IDEA.NS",
+    "INDHOTEL.NS",
+    "BOSCHLTD.NS",
+    "JSWENERGY.NS",
+    "MAXHEALTH.NS",
+    "UNITDSPR.BO",
+    "ICICIGI.NS",
+    "YESBANK.NS",
+    "MOTHERSON.NS",
+    "CUMMINSIND.NS",
+    "HINDPETRO.NS",
+    "GICRE.NS",
+    "IRCTC.NS",
+    "ICICIPRULI.NS",
+    "LUPIN.NS",
+    "SRF.NS",
+    "TIINDIA.NS",
+    "INDIANB.NS",
+    "POLYCAB.NS",
+    "SBICARD.NS",
+    "NMDC.NS",
+    "MARICO.NS",
+    "COLPAL.NS",
+    "NAUKRI.NS",
+    "BERGEPAINT.NS",
+    "GODREJPROP.NS",
+    "PERSISTENT.NS",
+    "OIL.NS",
+    "ALKEM.NS",
+    "MRF.NS",
+    "BANKINDIA.NS",
+    "CONCOR.NS",
+    "SOLARINDS.NS",
+    "AUROPHARMA.NS",
+    "ABBOTINDIA.NS",
+    "SUZLON.NS",
+    "INDUSTOWER.NS",
+    "PATANJALI.NS",
+    "CENTRALBK.NS",
+    "IDFCFIRSTB.NS",
+    "LTTS.NS",
+    "PIIND.NS",
+    "PGHH.NS",
+    "TORNTPOWER.NS",
+    "MUTHOOTFIN.NS",
+    "SAIL.NS",
+    "JSL.NS",
+    "GMRINFRA.NS",
+    "ASTRAL.NS",
+    "BHARATFORG.NS",
+    "TATACOMM.NS",
+    "MMYT",
+    "MPHASIS.NS",
+    "ASHOKLEY.NS",
+    "ACC.NS",
+    "PHOENIXLTD.NS",
+    "OBEROIRLTY.NS",
+    "SUPREMEIND.NS",
+    "PRESTIGE.NS",
+    "TATAELXSI.NS",
+    "ABCAPITAL.NS",
+    "SJVN.NS",
+    "LINDEINDIA.NS",
+    "AWL.NS",
+    "NIACL.NS",
+    "UBL.NS",
+    "PSB.NS",
+    "POLICYBZR.NS",
+    "SCHAEFFLER.NS",
+    "BALKRISIND.NS",
+    "MAHABANK.NS",
+    "NYKAA.NS",
+    "KPITTECH.NS",
+    "PETRONET.NS",
+    "THERMAX.NS",
+    "COFORGE.NS",
+    "DIXON.NS",
+    "PAGEIND.NS",
+    "AUBANK.NS",
+    "DALBHARAT.NS",
+    "APLAPOLLO.NS",
+    "HUDCO.NS",
+    "GUJGASLTD.NS",
+    "FLUOROCHEM.NS",
+    "FEDERALBNK.NS",
+    "UPL.NS",
+    "CRISIL.NS",
+    "UNOMINDA.NS",
+    "VOLTAS.NS",
+    "AIAENG.NS",
+    "LICHSGFIN.NS",
+    "NLCINDIA.NS",
+    "3MINDIA.NS",
+    "DELHIVERY.NS",
+    "FORTIS.NS",
+    "APOLLOTYRE.NS",
+    "HONAUT.NS",
+    "JKCEMENT.NS",
+    "BANDHANBNK.NS",
+    "MFSL.NS",
+    "BIOCON.NS",
+    "JUBLFOOD.NS",
+    "COROMANDEL.NS",
+    "BDL.NS",
+    "DEEPAKNTR.NS",
+    "ESCORTS.NS",
+    "GLAND.NS",
+    "IPCALAB.NS",
+    "IGL.NS",
+    "KIOCL.NS",
+    "ITI.NS",
+    "SYNGENE.NS",
+    "BSE.NS",
+    "NATIONALUM.NS",
+    "EXIDEIND.NS",
+    "BAYERCROP.NS",
+    "ZFCVINDIA.NS",
+    "JBMA.NS",
+    "NBCC.NS",
+    "BLUESTARCO.NS",
+    "GLENMARK.NS",
+    "ENDURANCE.NS",
+    "APARINDS.NS",
+    "HINDCOPPER.NS",
+    "TATACHEM.NS",
+    "KANSAINER.NS",
+    "EIHOTEL.NS",
+    "AARTIIND.NS",
+    "PAYTM.NS",
+    "SUNTV.NS",
+    "HATSUN.NS",
+    "MANYAVAR.NS",
+    "GRINDWELL.NS",
+    "WNS",
+    "IIFL.NS",
+    "CYIENT.NS",
+    "SKFINDIA.NS",
+    "TRIDENT.NS",
+    "RADICO.NS",
+    "RATNAMANI.NS",
+    "LAURUSLABS.NS",
+    "APLLTD.NS",
+    "SANOFI.NS",
+    "TIMKEN.NS",
+    "PEL.NS",
+    "RELAXO.NS",
+    "CARBORUNIV.NS",
+    "RAMCOCEM.NS",
+    "LALPATHLAB.NS",
+    "EMAMILTD.NS",
+    "ELGIEQUIP.NS",
+    "DEVYANI.NS",
+    "KAJARIACER.NS",
+    "INOXWIND.NS",
+    "MAHINDCIE.NS",
+    "CDSL.NS",
+    "RNW",
+    "SUMICHEM.NS",
+    "CROMPTON.NS",
+    "MCX.NS",
+    "IDFC.NS",
+    "ATUL.NS",
+    "BATAINDIA.NS",
+    "NATCOPHARM.NS",
+    "RITES.NS",
+    "PPLPHARMA.NS",
+    "TTML.NS",
+    "IIFLWAM.NS",
+    "CHALET.NS",
+    "OLECTRA.NS",
+    "KEC.NS",
+    "INDIAMART.NS",
+    "ZEEL.NS",
+    "RBLBANK.NS",
+    "WHIRLPOOL.NS",
+    "REDINGTON.NS",
+    "CENTURYPLY.NS",
+    "WELSPUNIND.NS",
+    "BLS.NS",
+    "MGL.NS",
+    "DCMSHRIRAM.NS",
+    "FINCABLES.NS",
+    "CHAMBLFERT.NS",
+    "BLUEDART.NS",
+    "KARURVYSYA.NS",
+    "PVR.NS",
+    "HBLPOWER.NS",
+    "BASF.NS",
+    "ALOKINDS.NS",
+    "SWSOLAR.NS",
+    "CHENNPETRO.NS",
+    "KSB.NS",
+    "VGUARD.NS",
+    "FINPIPE.NS",
+    "JSLHISAR.NS",
+    "TANLA.NS",
+    "SCHNEIDER.NS",
+    "RKFORGE.NS",
+    "FINEORG.NS",
+    "GMDCLTD.NS",
+    "AMBER.NS",
+    "ACE.NS",
+    "ASAHIINDIA.NS",
+    "IEX.NS",
+    "TEJASNET.NS",
+    "BEML.NS",
+    "MMTC.NS",
+    "RAYMOND.NS",
+    "ENGINERSIN.NS",
+    "HAPPSTMNDS.NS",
+    "NETWORK18.NS",
+    "ZENSARTECH.NS",
+    "ECLERX.NS",
+    "BBTC.NS",
+    "GRAPHITE.NS",
+    "CEATLTD.NS",
+    "BAJAJELEC.NS",
+    "SFL.NS",
+    "ANANTRAJ.NS",
+    "AAVAS.NS",
+    "PCBL.NS",
+    "AETHER.NS",
+    "SPARC.NS",
+    "KFINTECH.NS",
+    "EIDPARRY.NS",
+    "GRANULES.NS",
+    "ELECTCAST.NS",
+    "INGERRAND.NS",
+    "IBULHSGFIN.NS",
+    "AMARAJABAT.NS",
+    "GPIL.NS",
+    "ZYDUSWELL.NS",
+    "CUB.NS",
+    "RAJESHEXPO.NS",
+    "RPOWER.NS",
+    "INFIBEAM.NS",
+    "MAPMYINDIA.NS",
+    "CERA.NS",
+    "SAFARI.NS",
+    "MAHLIFE.NS",
+    "PRAJIND.NS",
+    "JUBLPHARMA.NS",
+    "NEULANDLAB.NS",
+    "CRAFTSMAN.NS",
+    "MASTEK.NS",
+    "RELINFRA.NS",
+    "SYRMA.NS",
+    "GALAXYSURF.NS",
+    "KALPATPOWR.NS",
+    "KTKBANK.NS",
+    "EASEMYTRIP.NS",
+    "MIDHANI.NS",
+    "RCF.NS",
+    "POWERMECH.NS",
+    "ESABINDIA.NS",
+    "QUESS.NS",
+    "FORCEMOT.NS",
+    "VARROC.NS",
+    "VIPIND.NS",
+    "RELIGARE.NS",
+    "CAMPUS.NS",
+    "KIRLFER.NS",
+    "ARVIND.NS",
+    "JSWHL.NS",
+    "SOUTHBANK.NS",
+    "SHRIPISTON.NS",
+    "VOLTAMP.NS",
+    "STAR.NS",
+    "FDC.NS",
+    "KNRCON.NS",
+    "VAIBHAVGBL.NS",
+    "TEXRAIL.NS",
+    "BORORENEW.NS",
+    "JINDWORLD.NS",
+    "EDELWEISS.NS",
+    "GOKEX.NS",
+    "RAIN.NS",
+    "MARKSANS.NS",
+    "SUNTECK.NS",
+    "PDSL.NS",
+    "VESUVIUS.NS",
+    "ITDC.NS",
+    "PAISALO.NS",
+    "SPANDANA.NS",
+    "HCC.NS",
+    "SURYAROSNI.NS",
+    "HEG.NS",
+    "GREENLAM.NS",
+    "ETHOSLTD.NS",
+    "TCI.NS",
+    "MSTCLTD.NS",
+    "PRINCEPIPE.NS",
+    "TATACOFFEE.NS",
+    "SYMPHONY.NS",
+    "JPASSOCIAT.NS",
+    "ASTRAMICRO.NS",
+    "CSBBANK.NS",
+    "GUJALKALI.NS",
+    "PURVA.NS",
+    "STLTECH.NS",
+    "PTC.NS",
+    "NAZARA.NS",
+    "MOIL.NS",
+    "IFBIND.NS",
+    "RTNPOWER.NS",
+    "SUPRAJIT.NS",
+    "WONDERLA.NS",
+    "GATEWAY.NS",
+    "ORIENTCEM.NS",
+    "GABRIEL.NS",
+    "VRLLOG.NS",
+    "NFL.NS",
+    "ASHOKA.NS",
+    "TIMETECHNO.NS",
+    "AARTIDRUGS.NS",
+    "SUNDARMHLD.NS",
+    "GULFOILLUB.NS",
+    "HEIDELBERG.NS",
+    "EMUDHRA.NS",
+    "KKCL.NS",
+    "WABAG.NS",
+    "BBOX.NS",
+    "TINPLATE.NS",
+    "GREENPANEL.NS",
+    "ORIENTELEC.NS",
+    "DISHTV.NS",
+    "WSTCSTPAPR.NS",
+    "HATHWAY.NS",
+    "HGS.NS",
+    "SUDARSCHEM.NS",
+    "SPICEJET.BO",
+    "IMAGICAA.NS",
+    "UNITECH.NS",
+    "SUBROS.NS",
+    "JISLDVREQS.NS",
+    "KSCL.NS",
+    "DELTACORP.NS",
+    "SKIPPER.NS",
+    "NUCLEUS.NS",
+    "JTEKTINDIA.NS",
+    "TATASTLLP.NS",
+    "SEQUENT.NS",
+    "PFOCUS.NS",
+    "LUXIND.NS",
+    "CONFIPET.NS",
+    "KSL.NS",
+    "HIKAL.NS",
+    "INDOCO.NS",
+    "CARERATING.NS",
+    "IMFA.NS",
+    "PRAKASH.NS",
+    "AVALON.NS",
+    "SANDHAR.NS",
+    "SHALBY.NS",
+    "PARAGMILK.NS",
+    "ASHIANA.NS",
+    "FILATEX.NS",
+    "TIDEWATER.NS",
+    "JCHAC.NS",
+    "CIGNITITEC.NS",
+    "NILKAMAL.NS",
+    "SANGHIIND.NS",
+    "GREENPLY.NS",
+    "QUICKHEAL.NS",
+    "ACCELYA.NS",
+    "AUTOAXLES.NS",
+    "REPCOHOME.NS",
+    "GTLINFRA.NS",
+    "MTNL.NS",
+    "APOLLOPIPE.NS",
+    "POLYPLEX.NS",
+    "VSTTILLERS.NS",
+    "SOMANYCERA.NS",
+    "PFS.NS",
+    "MAHLOG.NS",
+    "DOLLAR.NS",
+    "ANUP.NS",
+    "RPGLIFE.NS",
+    "INDIAGLYCO.NS",
+    "HUHTAMAKI.NS",
+    "VADILALIND.NS",
+    "KCP.NS",
+    "JAGRAN.NS",
+    "SASKEN.NS",
+    "ALEMBICLTD.NS",
+    "HINDOILEXP.NS",
+    "MPSLTD.NS",
+    "JINDALPOLY.NS",
+    "WENDT.NS",
+    "SMLISUZU.NS",
+    "HONDAPOWER.NS",
+    "KINGFA.NS",
+    "TCNSBRANDS.NS",
+    "FOSECOIND.NS",
+    "BARBEQUE.NS",
+    "MMFL.NS",
+    "GTPL.NS",
+    "SIYSIL.NS",
+    "RUPA.NS",
+    "LUMAXIND.NS",
+    "CAPACITE.NS",
+    "VIDHIING.NS",
+    "HIL.NS",
+    "CANTABIL.NS",
+    "OMAXE.NS",
+    "FMGOETZE.NS",
+    "HSIL.NS",
+    "GEPIL.NS",
+    "SPIC.NS",
+    "MANGLMCEM.NS",
+    "SIFY",
+    "GEOJITFSL.NS",
+    "TNPL.NS",
+    "SHANKARA.NS",
+    "GALLISPAT.NS",
+    "NELCO.NS",
+    "ASTEC.NS",
+    "GATI.NS",
+    "KITEX.NS",
+    "INDNIPPON.NS",
+    "NAVKARCORP.NS",
+    "DHAMPURSUG.NS",
+    "RANEHOLDIN.NS",
+    "IGARASHI.NS",
+    "HIMATSEIDE.NS",
+    "WHEELS.NS",
+    "IGPL.NS",
+    "INEOSSTYRO.NS",
+    "NACLIND.NS",
+    "MANGCHEFER.NS",
+    "KUANTUM.NS",
+    "COSMOFIRST.NS",
+    "BALAJITELE.NS",
+    "JAYBARMARU.NS",
+    "MONTECARLO.NS",
+    "APTECHT.NS",
+    "IMPAL.NS",
+    "INDORAMA.NS",
+    "KOKUYOCMLN.NS",
+    "COFFEEDAY.NS",
+    "BLISSGVS.NS",
+    "STERTOOLS.NS",
+    "RICOAUTO.NS",
+    "OAL.NS",
+    "HESTERBIO.NS",
+    "SPENCERS.NS",
+    "ORIENTPPR.NS",
+    "EXCELINDUS.NS",
+    "BODALCHEM.NS",
+    "KELLTONTEC.NS",
+    "NECLIFE.NS",
+    "HMVL.NS",
+    "3IINFOLTD.NS",
+    "YTRA",
+    "ASIANTILES.NS",
+    "RADIOCITY.NS",
+    "APEX.NS",
+    "MIRZAINT.NS",
+    "EBIXFOREX.NS",
+    "RCOM.NS",
+    "RBL.NS",
+    "NBIFIN.NS",
+    "NXTDIGITAL.NS",
+    "ZEELEARN.NS",
+    "MEP.NS",
+    "MLKFOOD.BO",
+    "FRETAIL.NS",
+    "SREINFRA.NS",
+    "JUMPNET.NS",
+    "MODAIRY.BO",
+    "FSC.NS"
+
+]
+
+
+# Counters
+total_companies = len(ticker_symbols)
+discarded_companies = 0
+available_companies = 0
+
+# Set start and end dates
+start_date = '2014-01-01'
+end_date = '2024-01-01'
+
+# Create an empty DataFrame to store data for companies with sector and industry
+all_stock_data = pd.DataFrame()
+
+# Loop through each ticker symbol
+for ticker_symbol in ticker_symbols:
+    try:
+        # Create a Ticker object
+        ticker = yf.Ticker(ticker_symbol)
+
+        # Get the info dictionary containing various information including sector and industry
+        info = ticker.info
+
+        # Get sector and industry information
+        sector = info.get('sector')
+        industry = info.get('industry')
+
+        # Check if both sector and industry are not None
+        if sector is not None and industry is not None:
+            # Download historical data for the current ticker symbol
+            stock_data = yf.download(ticker_symbol, start=start_date, end=end_date)
+
+            # Add stock information as columns to the DataFrame
+            stock_data['Company Name'] = info['longName']
+            stock_data['Sector'] = sector
+            stock_data['Industry'] = industry
+
+            # Append the stock data to the DataFrame for all stocks
+            all_stock_data = pd.concat([all_stock_data, stock_data])
+
+            available_companies += 1
+        else:
+            discarded_companies += 1
+    except HTTPError as e:
+        if e.response.status_code == 404:
+            print(f"Error 404: Ticker {ticker_symbol} not found. Discarding...")
+            discarded_companies += 1
+
+# Print summary
+print("Summary:")
+print("Total companies input:", total_companies)
+print("Number of companies discarded:", discarded_companies)
+print("Number of companies available with sector and industry:", available_companies)
+
+# Display the DataFrame
+print("\nStock Data:")
+print(all_stock_data)
+
+
+# In[5]:
+
+
+df = pd.DataFrame(all_stock_data)
+df
+
+
+# In[6]:
+
+
+#replacing the company name 
+df.rename(columns={'Company Name': 'company'}, inplace=True)
+
+
+# In[7]:
+
+
+#pd.set_option('display.max_rows', None)
+#Checking for the company counts
+company_counts=df['company_counts'] = df['company'].value_counts()
+company_counts
+
+
+# In[8]:
+
+
+# keeping the companies which has value counts 2465(deleting rest of them as they may be delisted or added to the list later on )
+num_companies_with_2465 = (company_counts == 2465).sum()
+num_companies_with_2465
+
+
+# In[9]:
+
+
+df['days_count'] = df['company'].map(df['company'].value_counts())
+df
+
+
+# In[10]:
+
+
+selected_companies = []
+
+
+# In[11]:
+
+
+for company, days_count in df.groupby('company')['days_count'].first().items():
+    if days_count == 2465:
+        selected_companies.append(company)
+
+
+
+# In[12]:
+
+
+df1 = df[df['company'].isin(selected_companies)]
+df1
+
+
+# In[48]:
+
+
+
+
+
+# In[13]:
+
+
+df1.drop(columns=['company_counts'], inplace=True)
+
+
+# In[14]:
+
+
+"""#pd.set_option('display.max_rows', None)
+company_counts1=df1['company_counts'] = df1['company'].value_counts()
+company_counts1"""
+
+
+# In[15]:
+
+
+"""num_2465 = (company_counts1 == 2465).sum()
+num_2465"""
+
+
+# In[16]:
+
+
+# !pip install ta
+
+
+# In[17]:
+
+
+#pip install --upgrade pip
+
+
+# In[18]:
+
+
+# pip install git+https://github.com/robertmartin8/PyPortfolioOpt.git
+
+
+# In[19]:
+
+
+List_of_companies = list(set(df1['company'].unique()))
+
+
+# In[20]:
+
+
+All_df_list = []
+for comp in List_of_companies:
+#     print(comp)
+    Individual_comp = df1.loc[df1['company'] == comp]
+    Individual_comp = Individual_comp.sort_values('Date')
+    Individual_comp['prev close'] = Individual_comp['Adj Close'].shift(1)
+    Individual_comp['Returns'] = (Individual_comp['Adj Close'] - Individual_comp['prev close'])/Individual_comp['prev close']
+    All_df_list.append(Individual_comp)
+final_df = pd.concat(All_df_list)
+final_df
+
+
+# In[21]:
+
+
+df2=final_df.pivot(columns="company",values="Returns")#transforming the data 
+
+
+# In[22]:
+
+
+df2
+
+
+# In[23]:
+
+
+# Get unique sectors
+sectors = df1["Sector"].unique()
+
+# Create an empty dictionary to store sector-wise company names
+sector_companies = {}
+
+# Iterate over each sector
+for sector in sectors:
+    # Filter data for the current sector
+    sector_data = df1[df1["Sector"] == sector]
+
+    # Get unique company names within the sector
+    companies = sector_data["company"].unique().tolist()
+
+    # Store the list of company names in the dictionary
+    sector_companies[sector] = companies
+
+sector_companies
+
+
+# In[40]:
+
+
+data2=final_df.pivot(columns="company",values="Adj Close")
+data2
+
+
+# In[25]:
+
+
+# Assuming df contains your data with columns 'sector', 'company', and 'adj close'
+
+# Pivot the data to get adjusted close values for each company within each sector
+sector_adj_close = df1.pivot_table(index='Date',columns= 'Sector', values='Adj Close')
+
+# Display the resulting DataFrame
+sector_adj_close
+
+
+# # ALLOCATION ON BASIS OF COMPANIES
+
+# # 1:MEAN VARIANCE
+
+# In[41]:
+
+
+# mean variance 
+from pypfopt import expected_returns, risk_models
+from pypfopt.efficient_frontier import EfficientFrontier
+
+# Assuming selected_data contains your data with columns 'company', 'Sector', and 'Adj Close'
+
+# Get unique sectors and create a dictionary to store sector-wise company names
+sectors = df1["Sector"].unique()
+sector_companies = {}
+for sector in sectors:
+    sector_data = df1[df1["Sector"] == sector]
+    companies = sector_data["company"].unique().tolist()
+    sector_companies[sector] = companies
+
+# Define sector mappings based on the sector-wise company names dictionary
+sector_mapper = {company: sector for sector, companies in sector_companies.items() for company in companies}
+
+# Define sector constraints based on the sector-wise company names dictionary
+sector_lower = {sector: 0 for sector in sectors}
+sector_upper = {sector: 0.1 for sector in sectors}
+
+# Calculate expected returns and the covariance matrix of the portfolio
+mu = expected_returns.mean_historical_return(data2)
+S = risk_models.sample_cov(data2)
+
+# Create the Efficient Frontier Object
+ef = EfficientFrontier(mu, S, solver='ECOS')
+
+# Add sector constraints to the Efficient Frontier
+ef.add_sector_constraints(sector_mapper, sector_lower, sector_upper)
+
+# Optimize for the maximum Sharpe ratio
+weights = ef.max_sharpe()
+
+# Clean the raw weights and print them
+cleaned_weights = ef.clean_weights()
+print(cleaned_weights)
+
+# Calculate and print the portfolio performance
+ef.portfolio_performance(verbose=True)
+
+
+# In[42]:
+
+
+print("mean ",mu)
+
+
+# In[44]:
+
+
+print("VARIANCE ",S)
+
+
+# In[43]:
+
+
+import plotly.express as px
+
+# Filter out zero-weighted assets
+non_zero_weights = {asset: weight for asset, weight in cleaned_weights.items() if weight != 0}
+
+# Extract labels and values from non-zero weights
+labels = list(non_zero_weights.keys())
+values = list(non_zero_weights.values())
+
+# Create a pie chart using Plotly
+fig = px.pie(names=labels, values=values, title='Non-zero Weight Portfolio Composition')
+fig.show()
+
+
+# In[ ]:
+
+
+
+
+
+# # CONDITIONAL VALUE AT RISK (CVAR)
+
+# In[210]:
+
+
+# EFFICIENT CVAR
+from pypfopt import EfficientCVaR
+
+# Calculate expected returns and the covariance matrix of the portfolio
+mu = expected_returns.mean_historical_return(data2)
+S = risk_models.sample_cov(data2)
+
+# Create the Efficient Frontier Object with CVaR
+ef = EfficientCVaR(mu, S)
+
+# Add sector constraints to the Efficient Frontier
+ef.add_sector_constraints(sector_mapper, sector_lower, sector_upper)
+
+# Optimize for the minimum CVaR
+weights = ef.min_cvar()
+
+# Clean the raw weights and print them
+cleaned_weightss = ef.clean_weights()
+print(cleaned_weightss)
+
+
+
+# Calculate and print the portfolio performance
+ef.portfolio_performance(verbose=True)
+
+
+# In[211]:
+
+
+import plotly.express as px
+
+# Filter out zero-weighted assets
+non_zero_weightss = {asset: weight for asset, weight in cleaned_weightss.items() if weight != 0}
+
+# Extract labels and values from non-zero weights
+labels = list(non_zero_weightss.keys())
+values = list(non_zero_weightss.values())
+
+# Create a pie chart using Plotly
+fig = px.pie(names=labels, values=values, title='Non-zero Weight Portfolio Composition')
+fig.show()
+
+
+# In[225]:
+
+
+# df1[df1["company"]=="Adani Enterprises Limited"]
+
+
+# # SECTOR WISE
+
+# ## MEAN VARIANCE
+
+# In[213]:
+
+
+# mean variance 
+import pandas as pd
+from pypfopt import expected_returns, risk_models
+from pypfopt.efficient_frontier import EfficientFrontier
+
+# Assuming selected_data contains your data with columns 'company', 'Sector', and 'Adj Close'
+
+# Get unique sectors and create a dictionary to store sector-wise company names
+sectors = df1["Sector"].unique()
+sector_companies = {}
+for sector in sectors:
+    sector_data = df1[df1["Sector"] == sector]
+    companies = sector_data["company"].unique().tolist()
+    sector_companies[sector] = companies
+
+# Define sector mappings based on the sector-wise company names dictionary
+sector_mapper = {company: sector for sector, companies in sector_companies.items() for company in companies}
+
+# Define sector constraints based on the sector-wise company names dictionary
+sector_lower = {sector: 0 for sector in sectors}
+sector_upper = {sector: 0.1 for sector in sectors}
+
+# Calculate expected returns and the covariance matrix of the portfolio
+mu = expected_returns.mean_historical_return(sector_adj_close)
+S = risk_models.sample_cov(sector_adj_close)
+
+# Create the Efficient Frontier Object
+ef = EfficientFrontier(mu, S, solver='ECOS')
+
+# Add sector constraints to the Efficient Frontier
+ef.add_sector_constraints(sector_mapper, sector_lower, sector_upper)
+
+# Optimize for the maximum Sharpe ratio
+weights = ef.max_sharpe()
+
+# Clean the raw weights and print them
+cleaned_weights = ef.clean_weights()
+print(cleaned_weights)
+
+# Calculate and print the portfolio performance
+ef.portfolio_performance(verbose=True)
+
+
+# In[214]:
+
+
+import plotly.express as px
+
+# Filter out zero-weighted assets
+non_zero_weights = {asset: weight for asset, weight in cleaned_weights.items() if weight != 0}
+
+# Extract labels and values from non-zero weights
+labels = list(non_zero_weights.keys())
+values = list(non_zero_weights.values())
+
+# Create a pie chart using Plotly
+fig = px.pie(names=labels, values=values, title='Non-zero Weight Portfolio Composition')
+fig.show()
+
+
+# ## CVAR
+
+# In[215]:
+
+
+# EFFICIENT CVAR
+from pypfopt import EfficientCVaR
+
+# Calculate expected returns and the covariance matrix of the portfolio
+mu = expected_returns.mean_historical_return(sector_adj_close)
+S = risk_models.sample_cov(sector_adj_close)
+
+# Create the Efficient Frontier Object with CVaR
+ef = EfficientCVaR(mu, S, beta= 0.70)
+
+# Add sector constraints to the Efficient Frontier
+ef.add_sector_constraints(sector_mapper, sector_lower, sector_upper)
+
+# Optimize for the minimum CVaR
+weights = ef.min_cvar()
+
+# Clean the raw weights and print them
+cleaned_weightss = ef.clean_weights()
+print(cleaned_weightss)
+
+
+
+# Calculate and print the portfolio performance
+ef.portfolio_performance(verbose=True)
+
+
+# In[216]:
+
+
+import plotly.express as px
+
+# Filter out zero-weighted assets
+non_zero_weightss = {asset: weight for asset, weight in cleaned_weightss.items() if weight != 0}
+
+# Extract labels and values from non-zero weights
+labels = list(non_zero_weightss.keys())
+values = list(non_zero_weightss.values())
+
+# Create a pie chart using Plotly
+fig = px.pie(names=labels, values=values, title='Non-zero Weight Portfolio Composition')
+fig.show()
+
+
+# # Monte Carlo
+
+# In[72]:
+
+
+plt.figure(figsize=(14, 7))
+for c in data2.columns.values:
+    plt.plot(data2.index, data2[c], lw=3, alpha=0.8,label=c)
+plt.legend(loc='upper left', fontsize=9)
+plt.ylabel('price in Rs')
+
+def portfolio_annualised_performance(weights, mean_returns, cov_matrix):
+    returns = np.sum(mean_returns*weights ) *252
+    std = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights))) * np.sqrt(252)
+    return std, returns
+
+def random_portfolios(num_portfolios, mean_returns, cov_matrix,risk_free_rate):
+    results = np.zeros((3, num_portfolios))
+    weights_record = []
+    for i in range(num_portfolios):
+        weights = np.random.random(len(mean_returns))
+        weights /= np.sum(weights)
+        weights_record.append(weights)
+        portfolio_return = np.sum(mean_returns * weights)
+        portfolio_std_dev = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
+        results[0,i] = portfolio_std_dev
+        results[1,i] = portfolio_return
+        results[2,i] = (portfolio_return - risk_free_rate) / portfolio_std_dev
+    return results, weights_record
+returns = data2.pct_change()
+mean_returns = returns.mean()
+cov_matrix = returns.cov()
+num_portfolios = 25000
+risk_free_rate = 0.0178
+
+def display_simulated_ef_with_random(mean_returns, cov_matrix, num_portfolios, risk_free_rate):
+    results, weights = random_portfolios(num_portfolios, mean_returns, cov_matrix, risk_free_rate)
+    max_sharpe_idx = np.argmax(results[2])
+    sdp, rp = results[0, max_sharpe_idx], results[1, max_sharpe_idx]
+    max_sharpe_allocation = pd.DataFrame(weights[max_sharpe_idx], index=data2.columns, columns=['allocation'])
+    max_sharpe_allocation.allocation = [round(i*100, 2) for i in max_sharpe_allocation.allocation]
+    max_sharpe_allocation = max_sharpe_allocation.T
+    
+    min_vol_idx = np.argmin(results[0])
+    sdp_min, rp_min = results[0, min_vol_idx], results[1, min_vol_idx]
+    min_vol_allocation = pd.DataFrame(weights[min_vol_idx], index=data2.columns, columns=['allocation'])
+    min_vol_allocation.allocation = [round(i*100, 2) for i in min_vol_allocation.allocation]
+    min_vol_allocation = min_vol_allocation.T
+    
+    print("-"*80)
+    print("Maximum Sharpe Ratio Portfolio Allocation\n")
+    print("Annualised Return:", round(rp, 2))
+    print("Annualised Volatility:", round(sdp, 2))
+    print("\n")
+    print(max_sharpe_allocation)
+    print("-"*80)
+    print("Minimum Volatility Portfolio Allocation\n")
+    print("Annualised Return:", round(rp_min, 2))
+    print("Annualised Volatility:", round(sdp_min, 2))
+    print("\n")
+    print(min_vol_allocation)
+# display_simulated_ef_with_random(mean_returns, cov_matrix, num_portfolios, risk_free_rate)
+
+
+# In[76]:
+
+
+output=pd.DataFrame(display_simulated_ef_with_random(mean_returns, cov_matrix, num_portfolios,risk_free_rate))
+output
+
+
+# In[82]:
+
+
+def neg_sharpe_ratio(weights, mean_returns, cov_matrix, risk_free_rate):
+    p_var, p_ret = portfolio_annualised_performance(weights, mean_returns, cov_matrix)
+    return -(p_ret - risk_free_rate) / p_var
+
+def max_sharpe_ratio(mean_returns, cov_matrix, risk_free_rate):
+    num_assets = len(mean_returns)
+    args = (mean_returns, cov_matrix, risk_free_rate)
+    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+    bound = (0.0,1.0)
+    bounds = tuple(bound for asset in range(num_assets))
+    result = sco.minimize(neg_sharpe_ratio, num_assets*[1./num_assets,], args=args,
+                        method='SLSQP', bounds=bounds, constraints=constraints)
+    return result
+
+
+# In[83]:
+
+
+def portfolio_volatility(weights, mean_returns, cov_matrix):
+    return portfolio_annualised_performance(weights, mean_returns, cov_matrix)[0]
+
+def min_variance(mean_returns, cov_matrix):
+    num_assets = len(mean_returns)
+    args = (mean_returns, cov_matrix)
+    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+    bound = (0.0,1.0)
+    bounds = tuple(bound for asset in range(num_assets))
+
+    result = sco.minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args,
+                        method='SLSQP', bounds=bounds, constraints=constraints)
+
+    return result
+
+
+# In[84]:
+
+
+def efficient_return(mean_returns, cov_matrix, target):
+    num_assets = len(mean_returns)
+    args = (mean_returns, cov_matrix)
+
+    def portfolio_return(weights):
+        return portfolio_annualised_performance(weights, mean_returns, cov_matrix)[1]
+
+    constraints = ({'type': 'eq', 'fun': lambda x: portfolio_return(x) - target},
+                   {'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+    bounds = tuple((0,1) for asset in range(num_assets))
+    result = sco.minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args, method='SLSQP', bounds=bounds, constraints=constraints)
+    return result
+
+
+def efficient_frontier(mean_returns, cov_matrix, returns_range):
+    efficients = []
+    for ret in returns_range:
+        efficients.append(efficient_return(mean_returns, cov_matrix, ret))
+    return efficients
+
+
+# In[89]:
+
+
+def display_calculated_ef_with_random(mean_returns, cov_matrix,num_portfolios, risk_free_rate):
+    results, _ = random_portfolios(num_portfolios,mean_returns,cov_matrix, risk_free_rate)
+    
+    max_sharpe = max_sharpe_ratio(mean_returns, cov_matrix, risk_free_rate)
+    sdp, rp = portfolio_annualised_performance(max_sharpe['x'], mean_returns, cov_matrix)
+    max_sharpe_allocation = pd.DataFrame(max_sharpe.x,index=table.columns,columns=['allocation'])
+    max_sharpe_allocation.allocation = [round(i*100,2)for i in max_sharpe_allocation.allocation]
+    max_sharpe_allocation = max_sharpe_allocation.T
+    max_sharpe_allocation
+
+    min_vol = min_variance(mean_returns, cov_matrix)
+    sdp_min, rp_min = portfolio_annualised_performance(min_vol['x'], mean_returns, cov_matrix)
+    min_vol_allocation = pd.DataFrame(min_vol.x,index=table.columns,columns=['allocation'])
+    min_vol_allocation.allocation = [round(i*100,2)for i in min_vol_allocation.allocation]
+    min_vol_allocation = min_vol_allocation.T
+    
+    print ("-"*80)
+    print ("Maximum Sharpe Ratio Portfolio Allocation\n")
+    print ("Annualised Return:", round(rp,2))
+    print ("Annualised Volatility:", round(sdp,2))
+    print ("\n")
+    print (max_sharpe_allocation)
+    print ("-"*80)
+    print ("Minimum Volatility Portfolio Allocation\n")
+    print ("Annualised Return:", round(rp_min,2))
+    print ("Annualised Volatility:", round(sdp_min,2))
+    print ("\n")
+    print (min_vol_allocation)
+    
+    plt.figure(figsize=(10, 7))
+    plt.scatter(results[0,:],results[1,:],c=results[2,:],cmap='YlGnBu', marker='o', s=10, alpha=0.3)
+    plt.colorbar()
+    plt.scatter(sdp,rp,marker='*',color='r',s=500, label='Maximum Sharpe ratio')
+    plt.scatter(sdp_min,rp_min,marker='*',color='g',s=500, label='Minimum volatility')
+
+    target = np.linspace(rp_min, 0.32, 50)
+    efficient_portfolios = efficient_frontier(mean_returns, cov_matrix, target)
+    plt.plot([p['fun'] for p in efficient_portfolios], target, linestyle='-.', color='black', label='efficient frontier')
+    plt.title('Calculated Portfolio Optimization based on Efficient Frontier')
+    plt.xlabel('annualised volatility')
+    plt.ylabel('annualised returns')
+    plt.legend(labelspacing=0.8)
+
+
+# In[222]:
+
+
+display_calculated_ef_with_random(mean_returns, cov_matrix, num_portfolios, risk_free_rate)
+
+
+# In[93]:
+
+
+from scipy.optimize import minimize
+
+# Define your utility functions here
+table=data2
+def neg_sharpe_ratio(weights, mean_returns, cov_matrix, risk_free_rate):
+    p_var, p_ret = portfolio_annualised_performance(weights, mean_returns, cov_matrix)
+    return -(p_ret - risk_free_rate) / p_var
+
+def max_sharpe_ratio(mean_returns, cov_matrix, risk_free_rate):
+    num_assets = len(mean_returns)
+    args = (mean_returns, cov_matrix, risk_free_rate)
+    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+    bound = (0.0,1.0)
+    bounds = tuple(bound for asset in range(num_assets))
+    result = minimize(neg_sharpe_ratio, num_assets*[1./num_assets,], args=args,
+                        method='SLSQP', bounds=bounds, constraints=constraints)
+    return result
+
+def portfolio_annualised_performance(weights, mean_returns, cov_matrix):
+    returns = np.sum(mean_returns*weights ) *252
+    std = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights))) * np.sqrt(252)
+    return std, returns
+
+def portfolio_volatility(weights, mean_returns, cov_matrix):
+    return portfolio_annualised_performance(weights, mean_returns, cov_matrix)[0]
+
+def min_variance(mean_returns, cov_matrix):
+    num_assets = len(mean_returns)
+    args = (mean_returns, cov_matrix)
+    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+    bound = (0.0,1.0)
+    bounds = tuple(bound for asset in range(num_assets))
+
+    result = minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args,
+                        method='SLSQP', bounds=bounds, constraints=constraints)
+
+    return result
+
+def efficient_return(mean_returns, cov_matrix, target):
+    num_assets = len(mean_returns)
+    args = (mean_returns, cov_matrix)
+
+    def portfolio_return(weights):
+        return portfolio_annualised_performance(weights, mean_returns, cov_matrix)[1]
+
+    constraints = ({'type': 'eq', 'fun': lambda x: portfolio_return(x) - target},
+                   {'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+    bounds = tuple((0,1) for asset in range(num_assets))
+    result = minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args, method='SLSQP', bounds=bounds, constraints=constraints)
+    return result
+
+def efficient_frontier(mean_returns, cov_matrix, returns_range):
+    efficients = []
+    for ret in returns_range:
+        efficients.append(efficient_return(mean_returns, cov_matrix, ret))
+    return efficients
+
+def display_calculated_ef_with_random(mean_returns, cov_matrix,num_portfolios, risk_free_rate):
+    results, _ = random_portfolios(num_portfolios,mean_returns,cov_matrix, risk_free_rate)
+    
+    max_sharpe = max_sharpe_ratio(mean_returns, cov_matrix, risk_free_rate)
+    sdp, rp = portfolio_annualised_performance(max_sharpe['x'], mean_returns, cov_matrix)
+    max_sharpe_allocation = pd.DataFrame(max_sharpe.x,index=table.columns,columns=['allocation'])
+    max_sharpe_allocation.allocation = [round(i*100,2)for i in max_sharpe_allocation.allocation]
+    max_sharpe_allocation = max_sharpe_allocation.T
+    max_sharpe_allocation
+
+    min_vol = min_variance(mean_returns, cov_matrix)
+    sdp_min, rp_min = portfolio_annualised_performance(min_vol['x'], mean_returns, cov_matrix)
+    min_vol_allocation = pd.DataFrame(min_vol.x,index=table.columns,columns=['allocation'])
+    min_vol_allocation.allocation = [round(i*100,2)for i in min_vol_allocation.allocation]
+    min_vol_allocation = min_vol_allocation.T
+    
+    print ("-"*80)
+    print ("Maximum Sharpe Ratio Portfolio Allocation\n")
+    print ("Annualised Return:", round(rp,2))
+    print ("Annualised Volatility:", round(sdp,2))
+    print ("\n")
+    print (max_sharpe_allocation)
+    print ("-"*80)
+    print ("Minimum Volatility Portfolio Allocation\n")
+    print ("Annualised Return:", round(rp_min,2))
+    print ("Annualised Volatility:", round(sdp_min,2))
+    print ("\n")
+    print (min_vol_allocation)
+    
+    plt.figure(figsize=(10, 7))
+    plt.scatter(results[0,:],results[1,:],c=results[2,:],cmap='YlGnBu', marker='o', s=10, alpha=0.3)
+    plt.colorbar()
+    plt.scatter(sdp,rp,marker='*',color='r',s=500, label='Maximum Sharpe ratio')
+    plt.scatter(sdp_min,rp_min,marker='*',color='g',s=500, label='Minimum volatility')
+
+    target = np.linspace(rp_min, 0.32, 50)
+    efficient_portfolios = efficient_frontier(mean_returns, cov_matrix, target)
+    plt.plot([p['fun'] for p in efficient_portfolios], target, linestyle='-.', color='black', label='efficient frontier')
+    plt.title('Calculated Portfolio Optimization based on Efficient Frontier')
+    plt.xlabel('annualised volatility')
+    plt.ylabel('annualised returns')
+    plt.legend(labelspacing=0.8)
+    plt.show()
+
+# Example usage:
+# display_calculated_ef_with_random(mean_returns, cov_matrix, num_portfolios, risk_free_rate)
+
+
+# In[94]:
+
+
+display_calculated_ef_with_random(mean_returns, cov_matrix, num_portfolios, risk_free_rate)
+
+
+# In[98]:
+
+
+# SHARPE RATIO FOR EFFICIENT CVAR
+from pypfopt import expected_returns, risk_models
+from pypfopt import EfficientCVaR
+import pandas as pd
+
+# Assume you have already defined mu, S, and ef as per your code snippet
+
+# Calculate the expected returns and the covariance matrix of the portfolio
+mu = expected_returns.mean_historical_return(data2)
+S = risk_models.sample_cov(data2)
+
+# Create the Efficient Frontier Object with CVaR
+ef = EfficientCVaR(mu, S)
+
+# Add sector constraints to the Efficient Frontier
+ef.add_sector_constraints(sector_mapper, sector_lower, sector_upper)
+
+# Optimize for the minimum CVaR
+weights = ef.min_cvar()
+
+# Clean the raw weights and print them
+cleaned_weights = ef.clean_weights()
+print(cleaned_weights)
+
+# Calculate the portfolio performance
+# Assuming you have risk-free rate and daily returns of the portfolio available
+# Replace rf_rate with the actual risk-free rate
+rf_rate = 0.02 / 252  # Assuming an annual risk-free rate of 2%, converted to daily rate
+portfolio_returns = ef.portfolio_performance()[0]  # Portfolio returns
+portfolio_volatility = ef.portfolio_performance()[1]  # Portfolio volatility (standard deviation)
+
+# Calculate Sharpe Ratio
+sharpe_ratio = (portfolio_returns - rf_rate) / portfolio_volatility
+
+# Print the Sharpe Ratio
+print("Sharpe Ratio:", sharpe_ratio)
+
+
+# In[100]:
+
+
+# # DISCRETE ALLOCATION OF EFFICIENT CVAR
+# from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
+# portfolio_amount = float(input("Enter the amount you want to invest: "))
+# if portfolio_amount != '' :
+#     # Get discrete allocation of each share per stock
+
+#     latest_prices = get_latest_prices(df)
+#     weights = cleaned_weights
+#     discrete_allocation = DiscreteAllocation(weights, latest_prices,total_portfolio_value = int(portfolio_amount))
+#     allocation , leftover = discrete_allocation.lp_portfolio()
+
+#     discrete_allocation_list = []
+
+
+#     for symbol in allocation:
+#         discrete_allocation_list.append(allocation.get(symbol))
+
+
+#     portfolio_df = pd.DataFrame(columns =['Ticker' , 'Number of stocks to buy'])
+
+#     portfolio_df['Ticker'] = allocation
+#     portfolio_df['Number of stocks to buy'] = discrete_allocation_list
+#     print('Number of stocks to buy with the amount of ₨ ' + str(portfolio_amount))
+#     print(portfolio_df)
+#     print('Funds remaining with you will be: ₨' , int(leftover))
+
+
+# REBALANCING
+
+# In[118]:
+
+
+non_zero_weights
+
+
+# In[131]:
+
+
+# List of companies
+companies = [
+    'APAR Industries Limited',
+    'APL Apollo Tubes Limited',
+    'Abbott India Limited',
+    'Adani Enterprises Limited',
+    'Bajaj Finance Limited',
+    'Bajaj Holdings & Investment Limited',
+    'Bharti Airtel Limited',
+    'Britannia Industries Limited',
+    'Cantabil Retail India Limited',
+    'Grindwell Norton Limited',
+    'Hindustan Petroleum Corporation Limited',
+    'Info Edge (India) Limited',
+    'JBM Auto Limited',
+    'KNR Constructions Limited',
+    'Kingfa Science & Technology (India) Limited',
+    'MPS Limited',
+    'Muthoot Finance Limited',
+    'Olectra Greentech Limited',
+    'Persistent Systems Limited',
+    'Petronet LNG Limited',
+    'Power Grid Corporation of India Limited',
+    'Procter & Gamble Hygiene and Health Care Limited',
+    'Ratnamani Metals & Tubes Limited',
+    'Reliance Industries Limited',
+    'SJVN Limited',
+    'Solar Industries India Limited',
+    'Tanla Platforms Limited',
+    'Tata Communications Limited',
+    'The Phoenix Mills Limited',
+    'Torrent Pharmaceuticals Limited',
+    'Uno Minda Limited'
+]
+
+# List of weights
+weights = [
+    0.01873,
+    0.04668,
+    0.09293,
+    0.02688,
+    0.07044,
+    0.02727,
+    0.00171,
+    0.04585,
+    0.02809,
+    0.03389,
+    0.00433,
+    0.04472,
+    0.03117,
+    0.00807,
+    0.0122,
+    0.02347,
+    0.00229,
+    0.03932,
+    0.04366,
+    0.01083,
+    0.06563,
+    0.05415,
+    0.02094,
+    0.0169,
+    0.03437,
+    0.02018,
+    0.05634,
+    0.02551,
+    0.04566,
+    0.00707,
+    0.04074
+]
+
+
+# In[132]:
+
+
+benchmark = '^BSESN'
+
+
+# In[133]:
+
+
+# Filter df1 based on the list of companies
+filtered_df = df1[df1['company'].isin(companies)]
+
+# Display the filtered DataFrame
+print(filtered_df)
+
+
+# In[134]:
+
+
+filtered_df
+
+
+# In[135]:
+
+
+new1=filtered_df.pivot_table(index='Date',columns= 'company', values='Adj Close')
+new1
+
+
+# In[136]:
+
+
+shares_df = pd.DataFrame(index=[new1.index[0]])
+portfolio_value = 10**7
+for s,w in zip(companies, weights):
+    shares_df[s + '_shares'] = np.floor((portfolio_value * np.array(w)) / new1[s][0])
+
+shares_df  
+
+
+# In[137]:
+
+
+# REBALANCING ENGINE (change between .year, .month, .day to execute the rebalancing)
+
+# set initial shares on the first day
+shares_df.loc[new1.index[0], :] = [np.floor((portfolio_value * w) / new1[s][0]) for s,w in zip(companies, weights)]
+
+# initialize variables
+balance_year = new1.index[0].year
+signal = False
+count = 0    # for loop count purpose
+
+# Store previous values in a dictionary
+prev_values = {}
+
+# Calculate portfolio value for the first day
+portfolio_value = sum([shares_df.loc[new1.index[0], s + '_shares'] * new1.loc[new1.index[0], s] for s in companies])
+
+for day in new1.index:
+    count += 1
+    if day == new1.index[0]:
+        shares_df.loc[day] = shares_df.loc[day] # First day
+
+        # Store initial values as previous values
+        for col in shares_df.columns:
+            prev_values[col] = shares_df.loc[day, col]
+
+
+    elif day.year != balance_year:
+        signal = True
+        # calculate new shares based on the new portfolio value and weights
+        new_shares = [np.floor((portfolio_value * w) / new1[s][day]) for s,w in zip(companies, weights)]
+        shares_df.loc[day, :] = new_shares
+        balance_year = day.year
+        count += 1
+        # print(f'Rebalance: {day.date()}, count: {count}') # uncomment to debug days ;)
+        # Store new values as previous values
+        for col in shares_df.columns:
+            prev_values[col] = shares_df.loc[day, col]
+
+    else:
+
+        signal = False
+
+        # Use previous values if it is not a rebalancing date
+        shares_df.loc[day, :] = [prev_values[col] for col in shares_df.columns]
+        
+        # print(f'Not rebalance, regular day: {day.date()}') # uncomment to debug days ;)
+
+
+
+    # Calculate asset values and portfolio value for the current day
+    asset_values = [shares_df.loc[day, s + '_shares'] * new1.loc[day, s] for s in companies]
+    portfolio_value = sum(asset_values)
+    
+    new1.loc[day, 'Signal'] = signal
+    new1.loc[day, 'Portfolio_Value'] = portfolio_value
+    
+    # Add shares to stock data frame
+    for s in companies:
+        new1.loc[day, s + '_shares'] = shares_df.loc[day, s + '_shares']
+        new1.loc[day, s + '_value'] = shares_df.loc[day, s + '_shares'] * new1.loc[day, s]
+
+
+# In[139]:
+
+
+# Calculate log returns for portfolio
+new1['Portfolio_Value_rets'] = np.log(new1['Portfolio_Value'] / new1['Portfolio_Value'].shift(1))
+
+# Calculate log returns for each stock
+for stock in companies:
+    new1[f'{stock}_rets'] = np.log(new1[stock] / new1[stock].shift(1))
+
+
+# In[140]:
+
+
+new1
+
+
+# In[141]:
+
+
+start_date_benchmark = new1.index[0]
+new1 = new1.dropna()
+
+
+# In[142]:
+
+
+new1
+
+
+# In[143]:
+
+
+# Calculate daily weight per asset
+for s in companies:
+    new1[s + '_weight'] = new1[s + '_value'] / new1['Portfolio_Value']
+
+
+# In[144]:
+
+
+new1.filter(regex='weight')
+
+
+# In[145]:
+
+
+import plotly.graph_objs as go
+fig = go.Figure()
+
+# Loop through each stock and add a trace for its shares
+for stock in companies:
+    fig.add_trace(go.Scatter(x=new1.index, y=shares_df[stock+'_shares'], mode='lines', name=stock+'_shares'))
+
+fig.update_layout(title='Shares per day',
+                  xaxis_title='Date',
+                  yaxis_title='Shares',
+                  width=800,
+                  height=400)
+
+fig.show()
+
+
+# In[146]:
+
+
+fig = go.Figure()
+
+# Loop through each stock and add a trace for its shares
+for stock in companies:
+    fig.add_trace(go.Scatter(x=new1.index, y=new1[stock + '_weight'], mode='lines', name=stock + '_weight'))
+
+fig.update_layout(title='Weights per day',
+                  xaxis_title='Date',
+                  yaxis_title='Weights',
+                  width=1000,
+                  height=600)
+
+fig.show()
+
+
+# In[147]:
+
+
+import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+
+# Create subplot layout
+fig = make_subplots(rows=2, cols=2, subplot_titles=('Portfolio Returns', 'Asset Returns', 'Shares Holding per Asset', 'Weights per Asset'))
+
+# Add traces to the subplots
+fig.add_trace(go.Scatter(x=new1.index, y=new1['Portfolio_Value_rets'].cumsum(), name='Portfolio'), row=1, col=1)
+
+for s in companies:
+    fig.add_trace(go.Scatter(x=new1.index, y=new1[f'{s}_rets'].cumsum(), name=f'{s}'), row=1, col=2)
+    fig.add_trace(go.Scatter(x=shares_df.index, y=shares_df[f'{s}_shares'], name=f'{s}'), row=2, col=1)
+    fig.add_trace(go.Scatter(x=new1.index, y=new1[f'{s}_weight'], name=f'{s}'), row=2, col=2)
+
+# Update subplot layout
+fig.update_layout(height=800, width=1200, title='Strategy Overview', showlegend=False)
+
+# Display the plot
+fig.show()
+
+
+# ## DISCRETE ALLOCATION
+# 
+
+# In[45]:
+
+
+# DISCRETE ALLOCATION OF EFFICIENT FRONTIER
+from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
+import pandas as pd
+
+# Function to convert INR to USD
+def inr_to_usd(amount_inr):
+    # Assuming 1 USD = 75 INR
+    return amount_inr / 75.0
+
+portfolio_amount_inr = float(input("Enter the amount you want to invest (INR): "))
+
+# Convert INR to USD
+portfolio_amount_usd = inr_to_usd(portfolio_amount_inr)
+
+if portfolio_amount_inr != '':
+    # Get discrete allocation of each share per stock
+    latest_prices = get_latest_prices(data2)
+    weights = cleaned_weights
+    discrete_allocation = DiscreteAllocation(weights, latest_prices, total_portfolio_value=int(portfolio_amount_usd))
+    allocation, leftover = discrete_allocation.lp_portfolio()
+
+    discrete_allocation_list = []
+
+    for symbol in allocation:
+        discrete_allocation_list.append(allocation.get(symbol))
+
+    portfolio_df = pd.DataFrame(columns=['Ticker', 'Number of stocks to buy'])
+    portfolio_df['Ticker'] = allocation
+    portfolio_df['Number of stocks to buy'] = discrete_allocation_list
+
+    # Convert leftover USD to INR
+    leftover_inr = leftover * 75
+
+    print('Number of stocks to buy with the amount of ₨', portfolio_amount_inr)
+    print(portfolio_df)
+    print('Funds remaining with you will be: ₨', int(leftover_inr))
+
+
+# In[188]:
+
+
+latest_prices.loc['Reliance Communications Limited']
+
+
+# In[46]:
+
+
+1000-(2.0999999046325684*75*1)
+
+
+# In[221]:
+
+
+# !pip install pygwalker 
+
+
+# In[219]:
+
+
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Data for the first pie chart (CVaR Portfolio)
+labels_cvar = list(non_zero_weightss.keys())
+values_cvar = list(non_zero_weightss.values())
+
+# Data for the second pie chart (Mean Variance Portfolio)
+labels_mean_var = list(non_zero_weights.keys())
+values_mean_var = list(non_zero_weights.values())
+
+# Create subplots
+fig = make_subplots(rows=1, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}]], 
+                    subplot_titles=['CVaR Portfolio Composition', 'Mean Variance Portfolio Composition'])
+
+# Add traces for the first pie chart
+fig.add_trace(go.Pie(labels=labels_cvar, values=values_cvar, name="CVaR Portfolio"), 1, 1)
+
+# Add traces for the second pie chart
+fig.add_trace(go.Pie(labels=labels_mean_var, values=values_mean_var, name="Mean Variance Portfolio"), 1, 2)
+
+# Update layout
+fig.update_layout(title_text="Portfolio Models Company Wise Comparison",)
+
+# Show figure
+fig.show()
+
+
+# In[220]:
+
+
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Data for the first pie chart (CVaR Portfolio)
+labels_cvar = list(non_zero_weightss.keys())
+values_cvar = list(non_zero_weightss.values())
+
+# Data for the second pie chart (Mean Variance Portfolio)
+labels_mean_var = list(non_zero_weights.keys())
+values_mean_var = list(non_zero_weights.values())
+
+# Create subplots
+fig = make_subplots(rows=1, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}]], 
+                    subplot_titles=['CVaR Portfolio Composition', 'Mean Variance Portfolio Composition'])
+
+# Add traces for the first pie chart
+fig.add_trace(go.Pie(labels=labels_cvar, values=values_cvar, name="CVaR Portfolio"), 1, 1)
+
+# Add traces for the second pie chart
+fig.add_trace(go.Pie(labels=labels_mean_var, values=values_mean_var, name="Mean Variance Portfolio"), 1, 2)
+
+# Update layout
+fig.update_layout(title_text="Portfolio Models  Sectoral  Comparison",)
+
+# Show figure
+fig.show()
+
+
+# In[ ]:
+
+
+
+
